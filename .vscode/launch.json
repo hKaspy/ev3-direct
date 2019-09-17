@@ -7,9 +7,25 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Current File",
-            "program": "${file}",
+            "name": "TS index.ts",
             "args": [
+                "${workspaceFolder}/src/index.ts"
+            ],
+            "runtimeArgs": [
+                "--nolazy",
+                "-r",
+                "ts-node/register"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "TS Current File",
+            "args": [
+                "${file}"
+            ],
+            "runtimeArgs": [
+                "--nolazy",
                 "-r",
                 "ts-node/register"
             ]
