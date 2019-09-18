@@ -1,26 +1,34 @@
 import { decodePointer, encodeByte, encodeMemoryAllocation, encodeNumber, encodePointer, encodeString, IParamMemoryPointer, IParamNumber, IResponsePointer, IResponseValue } from "./cmdutils";
 
-interface IRequest {
-    buffer: Buffer;
-    pointerMap: IResponsePointer[];
-}
+export type RequestParam = IParamNumber | IParamMemoryPointer | number | string;
 
-export interface IResponseError {
+interface IResponseError {
     counter: number;
     status: "error";
 }
 
-export interface IResponseOk {
+interface IResponseOk {
     counter: number;
     payload: Buffer;
     status: "ok";
 }
 
-export type IResponse = IResponseError | IResponseOk;
+export type Response = IResponseError | IResponseOk;
 
-export function assembleRequestBody(params: Array<IParamNumber | IParamMemoryPointer | number | string>): IRequest {
+export function encodeRequestHead(counter: number, bodyLength: number, awaitResponse = true): Buffer {
+    if (counter < 0 || counter > 32767) { throw new RangeError(`Invalid argument counter (${counter}): must be >= 0 and <= 32767`); }
+    if (bodyLength < 0 || bodyLength > 32764) { throw new RangeError(`Invalid argument bodyLength (${bodyLength}): must be >= 0 and <= 32764`); }
+
+    const head = Buffer.allocUnsafe(5);
+    head.writeUInt16LE(bodyLength + 3, 0);
+    head.writeUInt16LE(counter, 2);
+    head[4] = awaitResponse === true ? 0x00 : 0x08;
+
+    return head;
+}
+
+export function encodeRequestBody(params: RequestParam[]): Buffer {
     const paramsBuff: Buffer[] = [];
-    const allocMap: IResponsePointer[] = [];
     let indexLocal = 0;
     let indexGlobal = 0;
 
@@ -36,11 +44,6 @@ export function assembleRequestBody(params: Array<IParamNumber | IParamMemoryPoi
         } else if ("scope" in param) {
             if (param.scope === "global") {
                 paramsBuff.push(encodePointer(param, indexGlobal));
-                allocMap.push({
-                    bytes: param.bytes,
-                    index: indexGlobal,
-                    type: param.type,
-                });
                 indexGlobal += param.bytes;
             } else {
                 paramsBuff.push(encodePointer(param, indexLocal));
@@ -53,25 +56,28 @@ export function assembleRequestBody(params: Array<IParamNumber | IParamMemoryPoi
 
     paramsBuff.unshift(encodeMemoryAllocation(indexGlobal, indexLocal));
 
-    return {
-        buffer: Buffer.concat(paramsBuff),
-        pointerMap: allocMap,
-    };
+    return Buffer.concat(paramsBuff);
 }
 
-export function encodeRequestHead(counter: number, bodyLength: number, awaitResponse = true): Buffer {
-    if (counter < 0 || counter > 32767) { throw new RangeError(`Invalid argument counter (${counter}): must be >= 0 and <= 32767`); }
-    if (bodyLength < 0 || bodyLength > 32764) { throw new RangeError(`Invalid argument bodyLength (${bodyLength}): must be >= 0 and <= 32764`); }
+export function createPointerMap(params: RequestParam[]): IResponsePointer[] {
+    const pointerMap: IResponsePointer[] = [];
+    let indexGlobal = 0;
 
-    const head = Buffer.allocUnsafe(5);
-    head.writeUInt16LE(bodyLength + 3, 0);
-    head.writeUInt16LE(counter, 2);
-    head[4] = awaitResponse === true ? 0x00 : 0x08;
+    for (const param of params) {
+        if (typeof param === "object" && "scope" in param && param.scope === "global") {
+            pointerMap.push({
+                bytes: param.bytes,
+                index: indexGlobal,
+                type: param.type,
+            });
+            indexGlobal += param.bytes;
+        }
+    }
 
-    return head;
+    return pointerMap;
 }
 
-export function decodeResponseHead(buff: Buffer): IResponse {
+export function decodeResponseHead(buff: Buffer): Response {
     const length = buff.readUInt16LE(0);
     if (length !== (buff.length - 2)) { throw new RangeError(`Advertised length (${length} + 2) does not equal buff.length (${buff.length})`); }
 

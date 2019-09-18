@@ -5,16 +5,10 @@ import * as cmdutils from "../../src/cmdutils";
 
 describe("cmd.ts", () => {
 
-    describe("assembleRequestBody", () => {
+    describe("encodeRequestBody", () => {
 
         it("should encode empty body", () => {
-            const resp = imp.assembleRequestBody([]);
-
-            expect(resp).to.haveOwnProperty("buffer");
-            expect(resp).to.haveOwnProperty("pointerMap");
-
-            expect(resp.buffer).to.deep.equal(Buffer.alloc(2, 0));
-            expect(resp.pointerMap).to.deep.equal([]);
+            expect(imp.encodeRequestBody([])).to.deep.equal(Buffer.alloc(2, 0));
         });
 
         it("should encode non-empty body", () => {
@@ -38,13 +32,7 @@ describe("cmd.ts", () => {
                 }, 0),
             ]);
 
-            const pointerMap: cmdutils.IResponsePointer[] = [{
-                bytes: 4,
-                index: 0,
-                type: "int",
-            }];
-
-            const resp = imp.assembleRequestBody([
+            const buff = imp.encodeRequestBody([
                 0x5e,
                 {
                     bytes: 1,
@@ -63,15 +51,11 @@ describe("cmd.ts", () => {
                 },
             ]);
 
-            expect(resp).to.haveOwnProperty("buffer");
-            expect(resp).to.haveOwnProperty("pointerMap");
-
-            expect(resp.buffer).to.deep.equal(buffer);
-            expect(resp.pointerMap).to.deep.equal(pointerMap);
+            expect(buff).to.deep.equal(buffer);
         });
 
         it("should validate input", () => {
-            expect(() => imp.assembleRequestBody([{} as any])).to.throw(TypeError);
+            expect(() => imp.encodeRequestBody([{} as any])).to.throw(TypeError);
         });
     });
 
@@ -91,6 +75,51 @@ describe("cmd.ts", () => {
         it("should throw on bodyLength out of range", () => {
             expect(() => imp.encodeRequestHead(0, -1)).to.throw(RangeError);
             expect(() => imp.encodeRequestHead(0, 32765)).to.throw(RangeError);
+        });
+    });
+
+    describe("createPointerMap", () => {
+
+        it("should create a pointer map", () => {
+
+            const pointerMap: cmdutils.IResponsePointer[] = [
+                {
+                    bytes: 4,
+                    index: 0,
+                    type: "int",
+                },
+                {
+                    bytes: 4,
+                    index: 4,
+                    type: "int",
+                },
+            ];
+
+            const resp = imp.createPointerMap([
+                0x5e,
+                {
+                    bytes: 1,
+                    value: 0x5e,
+                },
+                "foo",
+                {
+                    bytes: 4,
+                    scope: "global",
+                    type: "int",
+                },
+                {
+                    bytes: 4,
+                    scope: "local",
+                    type: "float",
+                },
+                {
+                    bytes: 4,
+                    scope: "global",
+                    type: "int",
+                },
+            ]);
+
+            expect(resp).to.deep.equal(pointerMap);
         });
     });
 
