@@ -11,14 +11,14 @@ describe("class Broker", () => {
 
     it("should register a request", async () => {
         const brk = new Broker();
-        brk.registerRequest(0);
+        brk.awaitResponse(0);
         expect(brk.getPoolSize()).to.equal(1);
     });
 
     it("should pair a response to request", async () => {
         const brk = new Broker();
 
-        const prResp = brk.registerRequest(0);
+        const prResp = brk.awaitResponse(0);
 
         expect(brk.getPoolSize()).to.equal(1);
 
@@ -41,8 +41,8 @@ describe("class Broker", () => {
     it("should reject a duplicit request", async () => {
         const brk = new Broker();
 
-        brk.registerRequest(0);
-        await expect(brk.registerRequest(0)).to.be.rejectedWith(Error);
+        brk.awaitResponse(0);
+        await expect(brk.awaitResponse(0)).to.be.rejectedWith(Error);
 
         expect(brk.getPoolSize()).to.equal(1);
     });

@@ -11,15 +11,15 @@ export class Broker {
 
     private requestPool: IRequestPool = {};
 
-    public async registerRequest(reqId: number): Promise<Response> {
-        if (this.requestPool[reqId] !== undefined) { throw new Error(`Request with id ${reqId} already registered`); }
+    public async awaitResponse(respId: number): Promise<Response> {
+        if (this.requestPool[respId] !== undefined) { throw new Error(`Request with id ${respId} already registered`); }
 
         const pr = new Promise((resolve: (resp: Response) => void, reject) => {
-            this.requestPool[reqId] = { reject, resolve };
+            this.requestPool[respId] = { reject, resolve };
         });
 
         return pr.finally(() => {
-            delete this.requestPool[reqId];
+            delete this.requestPool[respId];
         });
     }
 
