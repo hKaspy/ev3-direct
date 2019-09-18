@@ -1,8 +1,8 @@
-import { IResponse } from "./cmd";
+import { Response } from "./cmd";
 
 interface IRequestPool {
     [key: number]: {
-        resolve: (resp: IResponse) => void;
+        resolve: (resp: Response) => void;
         reject: (reason: any) => void;
     };
 }
@@ -11,10 +11,10 @@ export class Broker {
 
     private requestPool: IRequestPool = {};
 
-    public async registerRequest(reqId: number): Promise<IResponse> {
+    public async registerRequest(reqId: number): Promise<Response> {
         if (this.requestPool[reqId] !== undefined) { throw new Error(`Request with id ${reqId} already registered`); }
 
-        const pr = new Promise((resolve: (resp: IResponse) => void, reject) => {
+        const pr = new Promise((resolve: (resp: Response) => void, reject) => {
             this.requestPool[reqId] = { reject, resolve };
         });
 
@@ -23,7 +23,7 @@ export class Broker {
         });
     }
 
-    public async registerResponse(resp: IResponse) {
+    public async registerResponse(resp: Response) {
         if (this.requestPool[resp.counter] === undefined) { throw new Error(`Could not pair response id ${resp.counter}`); }
 
         return this.requestPool[resp.counter].resolve(resp);
