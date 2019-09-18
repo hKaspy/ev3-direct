@@ -36,12 +36,12 @@ export function assembleRequestBody(params: Array<IParamNumber | IParamMemoryPoi
         } else if ("scope" in param) {
             if (param.scope === "global") {
                 paramsBuff.push(encodePointer(param, indexGlobal));
-                indexGlobal += param.bytes;
                 allocMap.push({
                     bytes: param.bytes,
                     index: indexGlobal,
                     type: param.type,
                 });
+                indexGlobal += param.bytes;
             } else {
                 paramsBuff.push(encodePointer(param, indexLocal));
                 indexLocal += param.bytes;
@@ -60,6 +60,9 @@ export function assembleRequestBody(params: Array<IParamNumber | IParamMemoryPoi
 }
 
 export function encodeRequestHead(counter: number, bodyLength: number, awaitResponse = true): Buffer {
+    if (counter < 0 || counter > 32767) { throw new RangeError(`Invalid argument counter (${counter}): must be >= 0 and <= 32767`); }
+    if (bodyLength < 0 || bodyLength > 32764) { throw new RangeError(`Invalid argument bodyLength (${bodyLength}): must be >= 0 and <= 32764`); }
+
     const head = Buffer.allocUnsafe(5);
     head.writeUInt16LE(bodyLength + 3, 0);
     head.writeUInt16LE(counter, 2);

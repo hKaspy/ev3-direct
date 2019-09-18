@@ -121,7 +121,7 @@ export function encodeMemoryAllocation(globalSize: number = 0, localSize: number
 }
 
 export function decodePointer(buff: Buffer, ptr: IResponsePointer): IResponseValue {
-    if (ptr.bytes < buff.length) { throw new RangeError(`ptr.bytes (${ptr.bytes}) must be less than buff.length (${buff.length})`); }
+    if (ptr.bytes > buff.length) { throw new RangeError(`ptr.bytes (${ptr.bytes}) must be <= buff.length (${buff.length})`); }
 
     if (ptr.type === "int") {
         if (ptr.bytes !== 1 && ptr.bytes !== 2 && ptr.bytes !== 4) { throw new RangeError(`Invalid ptr.bytes (${ptr.bytes}): accept 1|2|4`); }
@@ -137,7 +137,8 @@ export function decodePointer(buff: Buffer, ptr: IResponsePointer): IResponseVal
         };
     } else if (ptr.type === "string") {
         const value = buff.toString("ascii", ptr.index, buff.indexOf(0x00, ptr.index));
-        if (value.length > ptr.bytes) { throw new Error(`Invalid string: decoded length (${value.length}) must be <= ptr.bytes (${ptr.bytes})`); }
+        // string terminator must be part of the string bounds
+        if (value.length + 1 > ptr.bytes) { throw new Error(`Invalid string: decoded length (${value.length}) must be <= ptr.bytes (${ptr.bytes})`); }
         return {
             index: ptr.index,
             value,

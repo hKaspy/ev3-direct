@@ -162,7 +162,7 @@ describe("cmdutils.ts", () => {
             )).to.be.instanceOf(Buffer);
         });
 
-        it("should encodepointer", () => {
+        it("should encode a pointer", () => {
 
             // local scope
             expect(imp.encodePointer(
@@ -316,6 +316,162 @@ describe("cmdutils.ts", () => {
 
     });
 
+    describe("decodePointer", () => {
+
+        it("should decode a pointer, 8 bit integer", () => {
+            expect(imp.decodePointer(
+                Buffer.from([0x5e]),
+                {
+                    bytes: 1,
+                    index: 0,
+                    type: "int",
+                },
+            )).to.deep.equal({
+                index: 0,
+                value: 0x5e,
+            });
+        });
+
+        it("should decode a pointer, 16 bit integer", () => {
+            expect(imp.decodePointer(
+                Buffer.from([0xee, 0x55]),
+                {
+                    bytes: 2,
+                    index: 0,
+                    type: "int",
+                },
+            )).to.deep.equal({
+                index: 0,
+                value: 0x55ee,
+            });
+        });
+
+        it("should decode a pointer, 32 bit integer", () => {
+            expect(imp.decodePointer(
+                Buffer.from([0xbb, 0xaa, 0xee, 0x55]),
+                {
+                    bytes: 4,
+                    index: 0,
+                    type: "int",
+                },
+            )).to.deep.equal({
+                index: 0,
+                value: 0x55eeaabb,
+            });
+        });
+
+        it("should decode a pointer, 32 bit float", () => {
+            expect(imp.decodePointer(
+                Buffer.from([0xd8, 0x0f, 0x49, 0x40]),
+                {
+                    bytes: 4,
+                    index: 0,
+                    type: "float",
+                },
+            )).to.deep.equal({
+                index: 0,
+                value: 3.141592025756836,
+            });
+        });
+
+        it("should decode a pointer, string", () => {
+            // exact size
+            expect(imp.decodePointer(
+                Buffer.from("foo\u0000", "ascii"),
+                {
+                    bytes: 4,
+                    index: 0,
+                    type: "string",
+                },
+            )).to.deep.equal({
+                index: 0,
+                value: "foo",
+            });
+
+            // smaller size
+            expect(imp.decodePointer(
+                Buffer.from("foo\u0000aa", "ascii"),
+                {
+                    bytes: 6,
+                    index: 0,
+                    type: "string",
+                },
+            )).to.deep.equal({
+                index: 0,
+                value: "foo",
+            });
+        });
+
+        it("should decode a pointer with offset index", () => {
+            expect(imp.decodePointer(
+                Buffer.from([0, 0, 0x5e]),
+                {
+                    bytes: 1,
+                    index: 2,
+                    type: "int",
+                },
+            )).to.deep.equal({
+                index: 2,
+                value: 0x5e,
+            });
+        });
+
+        it("should throw on ptr.bytes larger than buff.length", () => {
+            expect(() => imp.decodePointer(
+                Buffer.alloc(6, 0),
+                {
+                    bytes: 8,
+                    index: 0,
+                    type: "string",
+                },
+            )).to.throw(RangeError);
+        });
+
+        it("should throw on invalid ptr.type", () => {
+            expect(() => imp.decodePointer(
+                Buffer.alloc(1, 0),
+                {
+                    bytes: 1,
+                    index: 0,
+                    type: "foo",
+                } as any,
+            )).to.throw(RangeError);
+        });
+
+        it("should throw on string terminator out of bounds", () => {
+            expect(() => imp.decodePointer(
+                Buffer.from("abcd\u0000", "ascii"),
+                {
+                    bytes: 4,
+                    index: 0,
+                    type: "string",
+                },
+            )).to.throw(Error);
+        });
+
+        it("should throw on invalid ptr.bytes", () => {
+            // type: int
+            expect(() => imp.decodePointer(
+                Buffer.alloc(4, 0),
+                {
+                    bytes: 3,
+                    index: 0,
+                    type: "int",
+                },
+            )).to.throw(RangeError);
+
+            // type: float
+            expect(() => imp.decodePointer(
+                Buffer.alloc(4, 0),
+                {
+                    bytes: 3,
+                    index: 0,
+                    type: "float",
+                },
+            )).to.throw(RangeError);
+        });
+    });
+
     describe("getBit", () => {
 
         it("should get 6th bit", () => {
@@ -328,17 +484,17 @@ describe("cmdutils.ts", () => {
             expect(imp.getBit(Buffer.from([0xff, 0xdf]), 1, 5)).to.equal(0);
         });
 
-        it("should throw error on buffer not being Buffer", () => {
+        it("should throw on buffer not being Buffer", () => {
             expect(() => imp.getBit("" as any, 0, 0)).to.throw(TypeError);
         });
 
-        it("should throw error on out of range bufferIndex", () => {
+        it("should throw on out of range bufferIndex", () => {
             expect(() => imp.getBit(Buffer.from([0x00]), -1, 0)).to.throw(RangeError);
             expect(() => imp.getBit(Buffer.from([0x00]), 1, 0)).to.throw(RangeError);
             expect(() => imp.getBit(Buffer.from([0x00]), 256, 0)).to.throw(RangeError);
         });
 
-        it("should throw error on out of range bitPosition", () => {
+        it("should throw on out of range bitPosition", () => {
             expect(() => imp.getBit(Buffer.from([0x00]), 0, -1)).to.throw(RangeError);
             expect(() => imp.getBit(Buffer.from([0x00]), 0, 8)).to.throw(RangeError);
             expect(() => imp.getBit(Buffer.from([0x00]), 0, 256)).to.throw(RangeError);
@@ -357,17 +513,17 @@ describe("cmdutils.ts", () => {
             expect(imp.setBit(Buffer.alloc(2, 0xff), 1, 5, 0)).to.deep.equal(Buffer.from([0xff, 0xdf]));
         });
 
-        it("should throw error on buffer not being Buffer", () => {
+        it("should throw on buffer not being Buffer", () => {
             expect(() => imp.setBit("" as any, 0, 0, 0)).to.throw(TypeError);
         });
 
-        it("should throw error on out of range bufferIndex", () => {
+        it("should throw on out of range bufferIndex", () => {
             expect(() => imp.setBit(Buffer.from([0x00]), -1, 0, 0)).to.throw(RangeError);
             expect(() => imp.setBit(Buffer.from([0x00]), 1, 0, 0)).to.throw(RangeError);
             expect(() => imp.setBit(Buffer.from([0x00]), 256, 0, 0)).to.throw(RangeError);
         });
 
-        it("should throw error on out of range bitPosition", () => {
+        it("should throw on out of range bitPosition", () => {
             expect(() => imp.setBit(Buffer.from([0x00]), 0, -1, 0)).to.throw(RangeError);
             expect(() => imp.setBit(Buffer.from([0x00]), 0, 8, 0)).to.throw(RangeError);
             expect(() => imp.setBit(Buffer.from([0x00]), 0, 256, 0)).to.throw(RangeError);
