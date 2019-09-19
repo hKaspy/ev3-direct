@@ -67,8 +67,6 @@ export function encodeByte(param: number): Buffer {
 }
 
 export function encodeNumber(param: IParamNumber): Buffer {
-    if (param.bytes !== 0 && param.bytes !== 1 && param.bytes !== 2 && param.bytes !== 4) { throw new RangeError(`Invalid param.bytes '${param.bytes}': accept 0|1|2|4`); }
-
     const buff = Buffer.alloc(param.bytes + 1, 0);
 
     if (param.bytes === 0) {
@@ -92,6 +90,8 @@ export function encodeNumber(param: IParamNumber): Buffer {
             if (!(-0x80000000 < param.value && param.value < 0x80000000)) { throw new RangeError("param.value must be in range -2,147,483,647 to +2,147,483,647 for param.bytes == 4"); }
             setBit(buff, 0, 0, 1);
             setBit(buff, 0, 1, 1);
+        } else {
+            throw new RangeError(`Invalid param.bytes '${param.bytes}': accept 0|1|2|4`);
         }
         buff.writeIntLE(param.value, 1, param.bytes);
     }

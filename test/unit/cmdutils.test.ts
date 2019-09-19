@@ -292,6 +292,12 @@ describe("cmdutils.ts", () => {
 
     describe("encodeMemoryAllocation", () => {
 
+        it("should accept default values", () => {
+            expect(imp.encodeMemoryAllocation(undefined, 0)).to.deep.equal(Buffer.alloc(2, 0));
+            expect(imp.encodeMemoryAllocation(0)).to.deep.equal(Buffer.alloc(2, 0));
+            expect(imp.encodeMemoryAllocation()).to.deep.equal(Buffer.alloc(2, 0));
+        });
+
         it("should set 4 bytes of local space", () => {
             expect(imp.encodeMemoryAllocation(0, 4)).to.deep.equal(Buffer.from([0x00, 0x10]));
         });
@@ -302,6 +308,10 @@ describe("cmdutils.ts", () => {
 
         it("should set 6 bytes of global space and 10 bytes of local space", () => {
             expect(imp.encodeMemoryAllocation(6, 10)).to.deep.equal(Buffer.from([0x06, 0x28]));
+        });
+
+        it("should use all available memory space", () => {
+            expect(imp.encodeMemoryAllocation(1023, 63)).to.deep.equal(Buffer.alloc(2, 0xff));
         });
 
         it("should throw error on out of range globalSize", () => {
