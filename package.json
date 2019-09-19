@@ -5,8 +5,9 @@
   "description": "Control your LEGO EV3 brick via direct commands - over Bluetooth, USB or Wi-Fi.",
   "main": "dist/index.js",
   "scripts": {
-    "test": "mocha",
-    "test:coverage": "nyc mocha",
+    "test": "mocha ./test/**/*.test.ts",
+    "test:unit": "mocha ./test/unit/*.test.ts",
+    "test:coverage": "nyc npm run test",
     "build": "tsc",
     "build:watch": "tsc --watch"
   },
