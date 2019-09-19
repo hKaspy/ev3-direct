@@ -65,6 +65,10 @@ describe("cmd.ts", () => {
             expect(imp.encodeRequestHead(0, 0)).to.deep.equal(Buffer.from([0x03, 0, 0, 0, 0]));
             expect(imp.encodeRequestHead(0x5e, 0)).to.deep.equal(Buffer.from([0x03, 0, 0x5e, 0, 0]));
             expect(imp.encodeRequestHead(0, 0, false)).to.deep.equal(Buffer.from([0x03, 0, 0, 0, 0x08]));
+
+            // default arg value
+            expect(imp.encodeRequestHead(0, 0, undefined)).to.deep.equal(Buffer.from([0x03, 0, 0, 0, 0]));
+            expect(imp.encodeRequestHead(0, 0, true)).to.deep.equal(Buffer.from([0x03, 0, 0, 0, 0]));
         });
 
         it("should throw on counter out of range", () => {
