@@ -4,14 +4,14 @@ import { createPointerMap, decodeResponseBody, decodeResponseHead, encodeRequest
 import { IResponseValue } from "./cmdutils";
 import { ResponseGlue } from "./ResponseGlue";
 
-export class EV3Brick {
+export class EV3Base {
 
     private broker: Broker = new Broker();
     private msgCounter: number = 0;
     private port: SerialPort;
 
-    constructor(brickPort: string) {
-        this.port = new SerialPort(brickPort, { autoOpen: false });
+    constructor(port: SerialPort) {
+        this.port = port;
 
         this.port
             .pipe(new ResponseGlue())

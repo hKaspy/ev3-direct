@@ -1,6 +1,6 @@
-import { EV3Brick } from "./EV3Brick";
+import { EV3Base } from "./EV3Base";
 
-export class EV3 extends EV3Brick {
+export class EV3 extends EV3Base {
 
     public async doNothing() {
         await this.sendRequest([0x01]);
