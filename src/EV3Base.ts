@@ -35,16 +35,18 @@ export class EV3Base {
         const buffReqBody = encodeRequestBody(params);
         const buffReqHead = encodeRequestHead(counter, buffReqBody.length, ack);
 
+        const prResp = ack === true ? this.broker.awaitResponse(counter) : null;
+
         await this.portWrite(Buffer.concat([buffReqHead, buffReqBody]));
 
-        if (ack === true) {
-            const resp = await this.broker.awaitResponse(counter);
+        if (prResp === null) {
+            return Promise.resolve();
+        } else {
+            const resp = await prResp;
             if (resp.status === "error") { return Promise.reject(); }
 
             const pointerMap = createPointerMap(params);
             return decodeResponseBody(resp.payload, pointerMap);
-        } else {
-            return Promise.resolve();
         }
     }
 
