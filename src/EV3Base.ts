@@ -52,6 +52,7 @@ export class EV3Base {
 
     public async connect() {
         return new Promise((resolve, reject) => {
+            if (this.port.isOpen === true) { resolve(); }
             this.port.open((err) => {
                 if (err) { reject(err); } else { resolve(); }
             });
@@ -74,12 +75,7 @@ export class EV3Base {
     private async portWrite(buff: Buffer): Promise<void> {
         return new Promise((resolve, reject) => {
             this.port.write(buff, (err) => {
-                if (err) {
-                    err.name = "ConnectionError";
-                    reject(err);
-                } else {
-                    resolve();
-                }
+                if (err) { reject(err); } else { resolve(); }
             });
         });
     }

@@ -28,13 +28,25 @@ describe("utils.ts", () => {
 
         afterEach(() => {
             MockBinding.reset();
+            sinon.restore();
         });
 
         it("should return an EV3 Class Promise", async () => {
             // make the method always return a supported FW version
-            sinon.stub(EV3.prototype, "getFWVersion").callsFake(async () => "V1.09H");
+            const stub = sinon.stub(EV3.prototype, "getFWVersion").callsFake(async () => "V1.09H");
 
             await expect(imp.connectBrick(new SerialPort(portName, { autoOpen: false }))).to.eventually.be.instanceOf(EV3);
+            expect(stub.called);
+        });
+
+        it("should print a console warning on unsupported FW", async () => {
+            // make the method always return a supported FW version
+            const stub = sinon.stub(EV3.prototype, "getFWVersion").callsFake(async () => "NOT SUPPORTED");
+            const consoleStub = sinon.stub(console, "warn").callsFake(() => "");
+
+            await expect(imp.connectBrick(new SerialPort(portName, { autoOpen: false }))).to.eventually.be.instanceOf(EV3);
+            expect(stub.called);
+            expect(consoleStub.called);
         });
     });
 
@@ -51,7 +63,9 @@ describe("utils.ts", () => {
         });
 
         it("should should throw if brick not found", () => {
-            expect(() => imp.findBrickPort([], "00112233aabb")).to.throw(Error);
+            expect(() => imp.findBrickPort([
+                { comName: "testname" },
+            ], "00112233aabb")).to.throw(Error);
         });
     });
 });
