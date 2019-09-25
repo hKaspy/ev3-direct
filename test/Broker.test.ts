@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import "mocha";
-import { Broker } from "../../src/Broker";
+import { Broker } from "../src/Broker";
 
 chai.use(chaiAsPromised);
 

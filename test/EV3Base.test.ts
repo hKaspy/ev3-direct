@@ -2,8 +2,8 @@ import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import "mocha";
 import sinon from "sinon";
-import * as cmd from "../../src/cmd";
-import { EV3Base } from "../../src/EV3Base";
+import * as cmd from "../src/cmd";
+import { EV3Base } from "../src/EV3Base";
 
 import MockBinding from "@serialport/binding-mock";
 import SerialPort from "@serialport/stream";

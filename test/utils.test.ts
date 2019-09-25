@@ -2,11 +2,11 @@ import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import "mocha";
 import sinon from "sinon";
-import * as imp from "../../src/utils";
+import * as imp from "../src/utils";
 
 import MockBinding from "@serialport/binding-mock";
 import SerialPort from "@serialport/stream";
-import { EV3 } from "../../src/EV3";
+import { EV3 } from "../src/EV3";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;

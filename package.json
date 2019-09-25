@@ -6,10 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha ./test/**/*.test.ts",
-    "test:unit": "mocha ./test/unit/*.test.ts",
     "test:coverage": "nyc npm run test",
-    "build": "tsc",
-    "build:watch": "tsc --watch"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

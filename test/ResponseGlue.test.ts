@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import "mocha";
-import { ResponseGlue } from "../../src/ResponseGlue";
+import { ResponseGlue } from "../src/ResponseGlue";
 
 describe("class ResponseGlue", () => {
 

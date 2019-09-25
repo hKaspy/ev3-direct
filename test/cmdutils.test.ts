@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import "mocha";
-import * as imp from "../../src/cmdutils";
+import * as imp from "../src/cmdutils";
 
 describe("cmdutils.ts", () => {
 

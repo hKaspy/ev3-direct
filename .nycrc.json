@@ -11,5 +11,6 @@
     ],
     "reporter": [
         "html"
-    ]
+    ],
+    "require": ["ts-node/register"]
 }
