@@ -3,7 +3,22 @@ import { EV3Base } from "./EV3Base";
 export class EV3 extends EV3Base {
 
     public async doNothing() {
+        // preserve returning Promise<void>
         await this.sendRequest([0x01]);
+    }
+
+    public async getBatteryCurrent() {
+        const resp = await this.sendRequest([
+            0x81,
+            0x02,
+            {
+                bytes: 4,
+                scope: "global",
+                type: "float",
+            },
+        ]);
+
+        return resp[0].value as number;
     }
 
     public async getBatteryPercent() {
@@ -34,20 +49,6 @@ export class EV3 extends EV3Base {
         return resp[0].value as number;
     }
 
-    public async getBatteryCurrent() {
-        const resp = await this.sendRequest([
-            0x81,
-            0x02,
-            {
-                bytes: 4,
-                scope: "global",
-                type: "float",
-            },
-        ]);
-
-        return resp[0].value as number;
-    }
-
     public async getBrickname() {
         const resp = await this.sendRequest([
             0xd3,
@@ -63,7 +64,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as number;
+        return resp[0].value as string;
     }
 
     public async getFWVersion() {
@@ -121,17 +122,17 @@ export class EV3 extends EV3Base {
     }
 
     public async getSubfolders(path: string) {
-        const count = await this._getSubfolderCount(path);
+        const count = await this.getSubfolderCount(path);
         const subs: string[] = [];
 
-        for (let i = 1; i < count; i++) {
-            subs.push(await this._getSubfolderName(path, i));
+        for (let i = 0; i < count; i++) {
+            subs.push(await this.getSubfolderName(path, i + 1));
         }
 
         return subs;
     }
 
-    public async _getSubfolderCount(path: string) {
+    public async getSubfolderCount(path: string) {
         const resp = await this.sendRequest([
             0xc0,
             0x0d,
@@ -146,7 +147,7 @@ export class EV3 extends EV3Base {
         return resp[0].value as number;
     }
 
-    public async _getSubfolderName(dirPath: string, index: number) {
+    public async getSubfolderName(dirPath: string, index: number) {
         const resp = await this.sendRequest([
             0xc0,
             0x0f,
