@@ -6,36 +6,36 @@ import { ResponseGlue } from "./ResponseGlue";
 
 export class EV3Base {
 
-    private broker: Broker = new Broker();
-    private msgCounter: number = 0;
-    private port: SerialPort;
+    private _broker: Broker = new Broker();
+    private _msgCounter: number = 0;
+    private _port: SerialPort;
 
     constructor(port: SerialPort) {
-        this.port = port;
+        this._port = port;
 
-        this.port
+        this._port
             .pipe(new ResponseGlue())
             .on("response", (buff) => {
                 const response = decodeResponseHead(buff);
-                this.broker.registerResponse(response);
+                this._broker.registerResponse(response);
             });
 
-        process.on("SIGINT", () => {
-            if (this.port.isOpen) {
-                this.port.close();
-            }
-        });
+        // process.on("SIGINT", () => {
+        //     if (this._port.isOpen) {
+        //         this._port.close();
+        //     }
+        // });
     }
 
     public async sendRequest(params: RequestParam[], ack?: true): Promise<IResponseValue[]>;
     public async sendRequest(params: RequestParam[], ack: false): Promise<void>;
     public async sendRequest(params: RequestParam[], ack: boolean = true) {
-        const counter = this.msgCounter++;
+        const counter = this._msgCounter++;
 
         const buffReqBody = encodeRequestBody(params);
         const buffReqHead = encodeRequestHead(counter, buffReqBody.length, ack);
 
-        const prResp = ack === true ? this.broker.awaitResponse(counter) : null;
+        const prResp = ack === true ? this._broker.awaitResponse(counter) : null;
 
         await this.portWrite(Buffer.concat([buffReqHead, buffReqBody]));
 
@@ -52,8 +52,8 @@ export class EV3Base {
 
     public async connect() {
         return new Promise((resolve, reject) => {
-            if (this.port.isOpen === true) { resolve(); }
-            this.port.open((err) => {
+            if (this._port.isOpen === true) { resolve(); }
+            this._port.open((err) => {
                 if (err) { reject(err); } else { resolve(); }
             });
         });
@@ -61,20 +61,20 @@ export class EV3Base {
 
     public async disconnect() {
         return new Promise((resolve, reject) => {
-            if (this.port.isOpen === false) { resolve(); }
-            this.port.close((err) => {
+            if (this._port.isOpen === false) { resolve(); }
+            this._port.close((err) => {
                 if (err) { reject(err); } else { resolve(); }
             });
         });
     }
 
     public isConnected() {
-        return this.port.isOpen === true;
+        return this._port.isOpen === true;
     }
 
     private async portWrite(buff: Buffer): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.port.write(buff, (err) => {
+            this._port.write(buff, (err) => {
                 if (err) { reject(err); } else { resolve(); }
             });
         });
