@@ -50,6 +50,8 @@ describe("class EV3Base", () => {
         expect(brick.isConnected()).to.equal(false);
     });
 
+    it("should close the serial port on SIGINT");
+
     it("should be able send a request", async () => {
         const port = new SerialPort(portName);
         const brick = new EV3Base(port);
