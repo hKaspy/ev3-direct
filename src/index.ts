@@ -12,9 +12,15 @@ export async function connectBrickById(brickId: string): Promise<EV3> {
 }
 
 export async function connectBrick(sp: SerialPort): Promise<EV3> {
-    const brick = new exports.EV3(sp);
+    const brick: EV3 = new exports.EV3(sp);
     await brick.connect();
-    const fwVersion = await brick.getFWVersion();
+
+    const fwVersion = await Promise.race([
+        brick.getFWVersion(),
+        new Promise((resolve: (val: string) => void) => setTimeout(() => resolve("timeout"), 5000)),
+    ]);
+
+    if (fwVersion === "timeout") { throw new Error("Timeout waiting for response from EV3 Brick. Check conection."); }
     // tslint:disable-next-line: no-console
     if (fwVersion !== "V1.09H") { console.warn(`Warning! This package is tested only on Firmware V1.09H. Your version (${fwVersion}) might not be supported.`); }
     return brick;
