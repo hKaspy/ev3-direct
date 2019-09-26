@@ -36,6 +36,7 @@
     "@types/sinon": "^7.0.13",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "husky": "^3.0.5",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "sinon": "^7.4.2",
@@ -46,5 +47,11 @@
   },
   "dependencies": {
     "serialport": "^7.1.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test",
+      "pre-push": "npm test"
+    }
   }
 }
