@@ -123,6 +123,30 @@ export class EV3 extends EV3Base {
         return resp[0].value as string;
     }
 
+    /**
+     * Get total size of the file/folder in kB
+     * @param path file path
+     */
+    public async getFileSize(path: string) {
+        const resp = await this.sendRequest([
+            opc.filename,
+            cmdc.filename.TOTALSIZE,
+            path,
+            {
+                bytes: 4,
+                scope: "global",
+                type: "int",
+            },
+            {
+                bytes: 4,
+                scope: "global",
+                type: "int",
+            },
+        ]);
+
+        return resp[2].value as number;
+    }
+
     public async getSubfolders(path: string) {
         const count = await this.getSubfolderCount(path);
         const subs: string[] = [];
@@ -170,5 +194,61 @@ export class EV3 extends EV3Base {
         ]);
 
         return resp[0].value as string;
+    }
+
+    public async fileExists(path: string) {
+        const resp = await this.sendRequest([
+            opc.filename,
+            cmdc.filename.EXIST,
+            path,
+            {
+                bytes: 1,
+                scope: "global",
+                type: "int",
+            },
+        ]);
+
+        return (resp[0].value as number) === 1;
+    }
+
+    /**
+     * Set Brick button backlight color
+     * @param color backlight color
+     * @param cycle lighting effect
+     */
+    public async setButtonLight(color: "off" | "green" | "orange" | "red", cycle: "still" | "flash" | "pulse" = "still") {
+        let flag: number;
+
+        if (color === "off") {
+            flag = 0;
+        } else {
+            flag = color === "green" ? 1 : color === "red" ? 2 : 3;
+            flag += cycle === "still" ? 0 : cycle === "flash" ? 3 : 6;
+        }
+
+        await this.sendRequest([
+            opc.uiWrite,
+            cmdc.uiWrite.LED,
+            {
+                bytes: 1,
+                value: flag,
+            },
+        ]);
+    }
+
+    /**
+     * Set Brick volume
+     * @param percent volume 0 - 100%
+     */
+    public async setVolume(percent: number) {
+        if (percent < 0 || percent > 100) { throw new RangeError("Argument 'percent' must be >= 0 and <= 100."); }
+        await this.sendRequest([
+            opc.info,
+            cmdc.info.SET_VOLUME,
+            {
+                bytes: 1,
+                value: percent,
+            },
+        ]);
     }
 }
