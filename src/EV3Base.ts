@@ -19,12 +19,6 @@ export class EV3Base {
                 const response = decodeResponseHead(buff);
                 this._broker.registerResponse(response);
             });
-
-        // process.on("SIGINT", () => {
-        //     if (this._port.isOpen) {
-        //         this._port.close();
-        //     }
-        // });
     }
 
     public async sendRequest(params: RequestParam[], ack?: true): Promise<IResponseValue[]>;
