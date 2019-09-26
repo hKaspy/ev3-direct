@@ -11,13 +11,13 @@ export async function connectBrickById(brickId: string): Promise<EV3> {
     return exports.connectBrickByPort(exports.findBrickPort(await exports.SerialPort.list(), brickId));
 }
 
-export async function connectBrick(sp: SerialPort): Promise<EV3> {
+export async function connectBrick(sp: SerialPort, timeoutMS = 5000): Promise<EV3> {
     const brick: EV3 = new exports.EV3(sp);
     await brick.connect();
 
     const fwVersion = await Promise.race([
         brick.getFWVersion(),
-        new Promise((resolve: (val: string) => void) => setTimeout(() => resolve("timeout"), 5000)),
+        new Promise((resolve: (val: string) => void) => setTimeout(() => resolve("timeout"), timeoutMS)),
     ]);
 
     if (fwVersion === "timeout") { throw new Error("Timeout waiting for response from EV3 Brick. Check conection."); }

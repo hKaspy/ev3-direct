@@ -80,6 +80,13 @@ describe("index.ts", () => {
             await expect(imp.connectBrick(new SerialPort(portName, { autoOpen: false }))).to.eventually.be.instanceOf(imp.EV3);
         });
 
+        it("should timeout after 5s without Brick response", async () => {
+            // simulate long delay, possibly no response at all
+            sinon.stub(imp.EV3.prototype, "getFWVersion").callsFake(async () => new Promise((resolve) => setTimeout(resolve, 4000)));
+
+            await expect(imp.connectBrick(new SerialPort(portName, { autoOpen: false }), 100)).to.be.rejectedWith(Error);
+        });
+
         it("should print a console warning on unsupported FW");
     });
 
