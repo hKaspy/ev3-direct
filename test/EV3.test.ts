@@ -12,6 +12,10 @@ const expect = chai.expect;
 const portName = "/dev/TESTPORT";
 SerialPort.Binding = MockBinding;
 
+function pluck<T, K extends keyof T>(o: T, propertyNames: K[]): K[] {
+    return propertyNames.filter((n) => n in o);
+}
+
 describe("class EV3", () => {
 
     beforeEach(() => {
@@ -30,13 +34,13 @@ describe("class EV3", () => {
     describe("simple methods", () => {
 
         it("should return a string", async () => {
-            const methods: Array<keyof EV3> = [
+            const methods = pluck(EV3.prototype, [
                 "getBrickname",
                 "getFWVersion",
                 "getHWVersion",
                 "getOSVersion",
                 "getSubfolderName",
-            ];
+            ]);
 
             const brick = new EV3(new SerialPort(portName, { autoOpen: false }));
             sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [{value: "foo"}]);
@@ -47,31 +51,31 @@ describe("class EV3", () => {
         });
 
         it("should return a number", async () => {
-            const methods: Array<keyof EV3> = [
+            const methods = pluck(EV3.prototype, [
                 "getBatteryCurrent",
                 "getBatteryPercent",
                 "getBatteryVoltage",
                 "getSubfolderCount",
-            ];
+            ]);
 
             const brick = new EV3(new SerialPort(portName, { autoOpen: false }));
             sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [{value: 123}]);
 
             for (const method of methods) {
-                await expect(brick[method](undefined as any, undefined as any)).to.eventually.equal(123);
+                await expect(brick[method](undefined as any)).to.eventually.equal(123);
             }
         });
 
         it("should return void", async () => {
-            const methods: Array<keyof EV3> = [
+            const methods = pluck(EV3.prototype, [
                 "doNothing",
-            ];
+            ]);
 
             const brick = new EV3(new SerialPort(portName, { autoOpen: false }));
             sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [{value: 123}]);
 
             for (const method of methods) {
-                await expect(brick[method](undefined as any, undefined as any)).to.eventually.equal(void 0);
+                await expect(brick[method]()).to.eventually.equal(void 0);
             }
         });
     });
