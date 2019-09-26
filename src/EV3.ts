@@ -1,16 +1,18 @@
+import cmdc from "./cmdcodes";
 import { EV3Base } from "./EV3Base";
+import opc from "./opcodes";
 
 export class EV3 extends EV3Base {
 
     public async doNothing() {
         // preserve returning Promise<void>
-        await this.sendRequest([0x01]);
+        await this.sendRequest([opc.nop]);
     }
 
     public async getBatteryCurrent() {
         const resp = await this.sendRequest([
-            0x81,
-            0x02,
+            opc.uiRead,
+            cmdc.uiRead.GET_IBATT,
             {
                 bytes: 4,
                 scope: "global",
@@ -23,8 +25,8 @@ export class EV3 extends EV3Base {
 
     public async getBatteryPercent() {
         const resp = await this.sendRequest([
-            0x81,
-            0x12,
+            opc.uiRead,
+            cmdc.uiRead.GET_LBATT,
             {
                 bytes: 1,
                 scope: "global",
@@ -37,8 +39,8 @@ export class EV3 extends EV3Base {
 
     public async getBatteryVoltage() {
         const resp = await this.sendRequest([
-            0x81,
-            0x01,
+            opc.uiRead,
+            cmdc.uiRead.GET_VBATT,
             {
                 bytes: 4,
                 scope: "global",
@@ -51,8 +53,8 @@ export class EV3 extends EV3Base {
 
     public async getBrickname() {
         const resp = await this.sendRequest([
-            0xd3,
-            0x0d,
+            opc.comGet,
+            cmdc.comGet.GET_BRICKNAME,
             {
                 bytes: 0,
                 value: 30,
@@ -69,8 +71,8 @@ export class EV3 extends EV3Base {
 
     public async getFWVersion() {
         const resp = await this.sendRequest([
-            0x81,
-            0x0a,
+            opc.uiRead,
+            cmdc.uiRead.GET_FW_VERS,
             {
                 bytes: 0,
                 value: 30,
@@ -87,8 +89,8 @@ export class EV3 extends EV3Base {
 
     public async getHWVersion() {
         const resp = await this.sendRequest([
-            0x81,
-            0x09,
+            opc.uiRead,
+            cmdc.uiRead.GET_HW_VERS,
             {
                 bytes: 0,
                 value: 30,
@@ -105,8 +107,8 @@ export class EV3 extends EV3Base {
 
     public async getOSVersion() {
         const resp = await this.sendRequest([
-            0x81,
-            0x03,
+            opc.uiRead,
+            cmdc.uiRead.GET_OS_VERS,
             {
                 bytes: 0,
                 value: 30,
@@ -134,8 +136,8 @@ export class EV3 extends EV3Base {
 
     public async getSubfolderCount(path: string) {
         const resp = await this.sendRequest([
-            0xc0,
-            0x0d,
+            opc.file,
+            cmdc.file.GET_FOLDERS,
             path,
             {
                 bytes: 1,
@@ -149,8 +151,8 @@ export class EV3 extends EV3Base {
 
     public async getSubfolderName(dirPath: string, index: number) {
         const resp = await this.sendRequest([
-            0xc0,
-            0x0f,
+            opc.file,
+            cmdc.file.GET_SUBFOLDER_NAME,
             dirPath,
             {
                 bytes: 1,
