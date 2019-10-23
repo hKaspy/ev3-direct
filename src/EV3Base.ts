@@ -1,12 +1,13 @@
 import SerialPort from "serialport";
 import { Broker } from "./Broker";
 import { createPointerMap, decodeResponseBody, decodeResponseHead, encodeRequestBody, encodeRequestHead, RequestParam} from "./cmd";
+import { Response } from "./cmd";
 import { IResponseValue } from "./cmdutils";
 import { ResponseGlue } from "./ResponseGlue";
 
 export class EV3Base {
 
-    private _broker: Broker = new Broker();
+    private _broker: Broker<Response> = new Broker();
     private _msgCounter: number = 0;
     private _port: SerialPort;
 
@@ -17,7 +18,7 @@ export class EV3Base {
             .pipe(new ResponseGlue())
             .on("response", (buff) => {
                 const response = decodeResponseHead(buff);
-                this._broker.registerResponse(response);
+                this._broker.registerResponse(response.counter, response);
             });
     }
 

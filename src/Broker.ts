@@ -1,21 +1,21 @@
-import { Response } from "./cmd";
-
-interface IRequestPool {
+interface IRequestPool<Resp> {
     [key: number]: {
-        resolve: (resp: Response) => void;
+        resolve: (resp: Resp) => void;
         reject: (reason: any) => void;
     };
 }
 
-export class Broker {
+export class Broker<T> {
 
-    private requestPool: IRequestPool = {};
+    private requestPool: IRequestPool<T> = {};
 
-    public async awaitResponse(respId: number): Promise<Response> {
-        if (this.requestPool[respId] !== undefined) { throw new Error(`Request with id ${respId} already registered`); }
+    public async awaitResponse(respId: number, timeout: number = 5000): Promise<T> {
+        if (timeout < 0) { throw new TypeError(`argument "timeout" must be >= 0`); }
+        if (this.requestPool[respId] !== undefined) { throw new Error(`respId ${respId} already registered`); }
 
-        const pr = new Promise((resolve: (resp: Response) => void, reject) => {
+        const pr = new Promise((resolve: (resp: T) => void, reject) => {
             this.requestPool[respId] = { reject, resolve };
+            if (timeout > 0) { setTimeout(() => { reject(new Error("timeout reached")); }, timeout); }
         });
 
         return pr.finally(() => {
@@ -23,10 +23,10 @@ export class Broker {
         });
     }
 
-    public async registerResponse(resp: Response) {
-        if (this.requestPool[resp.counter] === undefined) { throw new Error(`Could not pair response id ${resp.counter}`); }
+    public async registerResponse(respID: number, resp: T) {
+        if (this.requestPool[respID] === undefined) { throw new Error(`respID ${respID} not registered`); }
 
-        return this.requestPool[resp.counter].resolve(resp);
+        return this.requestPool[respID].resolve(resp);
     }
 
     public getPoolSize(): number {
