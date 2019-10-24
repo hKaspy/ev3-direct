@@ -3,7 +3,7 @@ import { Broker } from "./Broker";
 import { createPointerMap, decodeResponseBody, decodeResponseHead, encodeRequestBody, encodeRequestHead, RequestParam} from "./cmd";
 import { Response } from "./cmd";
 import { IResponseValue } from "./cmdutils";
-import { ResponseGlue } from "./ResponseGlue";
+import EV3DCParser from "./serialport-parser-EV3DC";
 
 export class EV3Base {
 
@@ -15,8 +15,8 @@ export class EV3Base {
         this._port = port;
 
         this._port
-            .pipe(new ResponseGlue())
-            .on("response", (buff) => {
+            .pipe(new EV3DCParser())
+            .on("data", (buff: Buffer) => {
                 const response = decodeResponseHead(buff);
                 this._broker.registerResponse(response.counter, response);
             });
