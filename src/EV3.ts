@@ -123,6 +123,57 @@ export class EV3 extends EV3Base {
         return resp[0].value as string;
     }
 
+    public async getSensorValueRaw(portNumber: 1 | 2 | 3 | 4) {
+        const resp = await this.sendRequest([
+            opc.inputDevice,
+            cmdc.inputDevice.GET_RAW,
+            {
+                bytes: 0,
+                value: 0,
+            },
+            {
+                bytes: 0,
+                value: portNumber,
+            },
+            {
+                bytes: 4,
+                scope: "global",
+                type: "int",
+            },
+        ]);
+
+        return resp[0].value as number;
+    }
+
+    public async getSensorValueSI(portNumber: 1 | 2 | 3 | 4) {
+        const resp = await this.sendRequest([
+            opc.inputReadSI,
+            {
+                bytes: 0,
+                value: 0,
+            },
+            {
+                bytes: 0,
+                value: portNumber,
+            },
+            {
+                bytes: 0,
+                value: 0,
+            },
+            {
+                bytes: 0,
+                value: -1,
+            },
+            {
+                bytes: 4,
+                scope: "global",
+                type: "float",
+            },
+        ]);
+
+        return resp[0].value as number;
+    }
+
     /**
      * Get total size of the file/folder in kB
      * @param path file path
