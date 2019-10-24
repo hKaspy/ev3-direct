@@ -5,7 +5,12 @@
     ],
     "jsRules": {},
     "rules": {
-        "max-line-length":false
+        "max-line-length": false,
+        "variable-name": [
+            true,
+            "check-format",
+            "allow-leading-underscore"
+        ]
     },
     "rulesDirectory": []
 }
