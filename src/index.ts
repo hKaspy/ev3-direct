@@ -1,7 +1,9 @@
 import SerialPort from "serialport";
+import cmdcodes from "./cmdcodes";
 import { EV3 } from "./EV3";
+import opcodes from "./opcodes";
 
-export { EV3, SerialPort };
+export { EV3, SerialPort, opcodes, cmdcodes };
 
 /**
  * Connect to the EV3 Brick by specifying serial port name
