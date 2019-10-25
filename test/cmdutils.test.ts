@@ -336,10 +336,7 @@ describe("cmdutils.ts", () => {
                     index: 0,
                     type: "int",
                 },
-            )).to.deep.equal({
-                index: 0,
-                value: 0x5e,
-            });
+            )).to.deep.equal(0x5e);
         });
 
         it("should decode a pointer, 16 bit integer", () => {
@@ -350,10 +347,7 @@ describe("cmdutils.ts", () => {
                     index: 0,
                     type: "int",
                 },
-            )).to.deep.equal({
-                index: 0,
-                value: 0x55ee,
-            });
+            )).to.deep.equal(0x55ee);
         });
 
         it("should decode a pointer, 32 bit integer", () => {
@@ -364,10 +358,7 @@ describe("cmdutils.ts", () => {
                     index: 0,
                     type: "int",
                 },
-            )).to.deep.equal({
-                index: 0,
-                value: 0x55eeaabb,
-            });
+            )).to.deep.equal(0x55eeaabb);
         });
 
         it("should decode a pointer, 32 bit float", () => {
@@ -378,10 +369,7 @@ describe("cmdutils.ts", () => {
                     index: 0,
                     type: "float",
                 },
-            )).to.deep.equal({
-                index: 0,
-                value: 3.141592025756836,
-            });
+            )).to.deep.equal(3.141592025756836);
         });
 
         it("should decode a pointer, string", () => {
@@ -393,10 +381,7 @@ describe("cmdutils.ts", () => {
                     index: 0,
                     type: "string",
                 },
-            )).to.deep.equal({
-                index: 0,
-                value: "foo",
-            });
+            )).to.deep.equal("foo");
 
             // smaller size
             expect(imp.decodePointer(
@@ -406,10 +391,7 @@ describe("cmdutils.ts", () => {
                     index: 0,
                     type: "string",
                 },
-            )).to.deep.equal({
-                index: 0,
-                value: "foo",
-            });
+            )).to.deep.equal("foo");
         });
 
         it("should decode a pointer with offset index", () => {
@@ -420,10 +402,7 @@ describe("cmdutils.ts", () => {
                     index: 2,
                     type: "int",
                 },
-            )).to.deep.equal({
-                index: 2,
-                value: 0x5e,
-            });
+            )).to.deep.equal(0x5e);
         });
 
         it("should throw on ptr.bytes larger than buff.length", () => {

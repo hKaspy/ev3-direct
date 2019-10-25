@@ -156,11 +156,10 @@ describe("cmd.ts", () => {
     describe("decodeResponseBody", () => {
 
         it("should decode response body", () => {
-            const resp: cmdutils.IResponseValue[] = [{index: 0, value: "foo"}];
             expect(imp.decodeResponseBody(
                 Buffer.from([0x66, 0x6f, 0x6f, 0, 0, 0]),
                 [{bytes: 6, index: 0, type: "string"}],
-            )).to.deep.equal(resp);
+            )).to.deep.equal(["foo"]);
         });
 
         it("should throw on bad body size", () => {

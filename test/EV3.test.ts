@@ -43,7 +43,7 @@ describe("class EV3", () => {
             ]);
 
             const brick = new EV3(new SerialPort(portName, { autoOpen: false }));
-            sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [{value: "foo"}]);
+            sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => ["foo"]);
 
             for (const method of methods) {
                 await expect(brick[method](undefined as any, undefined as any)).to.eventually.equal("foo");
@@ -59,7 +59,7 @@ describe("class EV3", () => {
             ]);
 
             const brick = new EV3(new SerialPort(portName, { autoOpen: false }));
-            sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [{value: 123}]);
+            sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [123]);
 
             for (const method of methods) {
                 await expect(brick[method](undefined as any)).to.eventually.equal(123);
@@ -72,7 +72,7 @@ describe("class EV3", () => {
             ]);
 
             const brick = new EV3(new SerialPort(portName, { autoOpen: false }));
-            sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [{value: 123}]);
+            sinon.stub(brick, "sendRequest").callsFake(async (): Promise<any> => [123]);
 
             for (const method of methods) {
                 await expect(brick[method]()).to.eventually.equal(void 0);

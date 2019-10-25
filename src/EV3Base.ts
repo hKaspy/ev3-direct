@@ -2,7 +2,6 @@ import SerialPort from "serialport";
 import { Broker } from "./Broker";
 import { createPointerMap, decodeResponseBody, decodeResponseHead, encodeRequestBody, encodeRequestHead, RequestParam} from "./cmd";
 import { Response } from "./cmd";
-import { IResponseValue } from "./cmdutils";
 import EV3DCParser from "./serialport-parser-EV3DC";
 
 export class EV3Base {
@@ -28,7 +27,7 @@ export class EV3Base {
      * Takes string, single byte number (0 - 255) or IParam* object.
      * @param ack wait for response - default true
      */
-    public async sendRequest(params: RequestParam[], ack?: true): Promise<IResponseValue[]>;
+    public async sendRequest(params: RequestParam[], ack?: true): Promise<Array<number | string>>;
     public async sendRequest(params: RequestParam[], ack: false): Promise<void>;
     public async sendRequest(params: RequestParam[], ack: boolean = true) {
         const counter = this._msgCounter++;

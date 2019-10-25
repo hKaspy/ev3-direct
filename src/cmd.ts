@@ -1,4 +1,4 @@
-import { decodePointer, encodeByte, encodeMemoryAllocation, encodeNumber, encodePointer, encodeString, IParamMemoryPointer, IParamNumber, IResponsePointer, IResponseValue } from "./cmdutils";
+import { decodePointer, encodeByte, encodeMemoryAllocation, encodeNumber, encodePointer, encodeString, IParamMemoryPointer, IParamNumber, IResponsePointer } from "./cmdutils";
 
 export type RequestParam = IParamNumber | IParamMemoryPointer | number | string;
 
@@ -100,7 +100,7 @@ export function decodeResponseHead(buff: Buffer): Response {
     }
 }
 
-export function decodeResponseBody(buff: Buffer, pointerMap: IResponsePointer[]): IResponseValue[] {
+export function decodeResponseBody(buff: Buffer, pointerMap: IResponsePointer[]) {
     const allocBytes = pointerMap.reduce((acc, cur) => acc + cur.bytes, 0);
     if (allocBytes !== buff.length) { throw new Error(`buff.length (${buff.length}) must be the same as sum of pointerMap[i].bytes (${allocBytes})`); }
 

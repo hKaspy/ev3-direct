@@ -20,7 +20,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as number;
+        return resp[0] as number;
     }
 
     public async getBatteryPercent() {
@@ -34,7 +34,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as number;
+        return resp[0] as number;
     }
 
     public async getBatteryVoltage() {
@@ -48,7 +48,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as number;
+        return resp[0] as number;
     }
 
     public async getBrickname() {
@@ -66,7 +66,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as string;
+        return resp[0] as string;
     }
 
     public async getFWVersion() {
@@ -84,7 +84,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as string;
+        return resp[0] as string;
     }
 
     public async getHWVersion() {
@@ -102,7 +102,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as string;
+        return resp[0] as string;
     }
 
     public async getOSVersion() {
@@ -120,7 +120,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as string;
+        return resp[0] as string;
     }
 
     /**
@@ -144,7 +144,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[2].value as number;
+        return resp[2] as number;
     }
 
     public async getSubfolders(path: string) {
@@ -170,7 +170,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as number;
+        return resp[0] as number;
     }
 
     public async getSubfolderName(dirPath: string, index: number) {
@@ -193,7 +193,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return resp[0].value as string;
+        return resp[0] as string;
     }
 
     public async fileExists(path: string) {
@@ -208,7 +208,7 @@ export class EV3 extends EV3Base {
             },
         ]);
 
-        return (resp[0].value as number) === 1;
+        return (resp[0] as number) === 1;
     }
 
     /**

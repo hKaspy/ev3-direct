@@ -18,11 +18,6 @@ export interface IResponsePointer {
     type: PointerType;
 }
 
-export interface IResponseValue {
-    index: number;
-    value: number | string;
-}
-
 export function encodePointer(param: IParamMemoryPointer, index: number): Buffer {
     if (index < 0) { throw new RangeError(`Invalid argument index '${index}': accept >= 0`); }
     if (param.bytes < 0) { throw new RangeError(`Invalid param.bytes '${param.bytes}': accept >= 0`); }
@@ -120,29 +115,20 @@ export function encodeMemoryAllocation(globalSize: number = 0, localSize: number
     return buf;
 }
 
-export function decodePointer(buff: Buffer, ptr: IResponsePointer): IResponseValue {
+export function decodePointer(buff: Buffer, ptr: IResponsePointer): number | string {
     if (ptr.bytes > buff.length) { throw new RangeError(`ptr.bytes (${ptr.bytes}) must be <= buff.length (${buff.length})`); }
 
     if (ptr.type === "int") {
         if (ptr.bytes !== 1 && ptr.bytes !== 2 && ptr.bytes !== 4) { throw new RangeError(`Invalid ptr.bytes (${ptr.bytes}): accept 1|2|4`); }
-        return {
-            index: ptr.index,
-            value: buff.readIntLE(ptr.index, ptr.bytes),
-        };
+        return buff.readIntLE(ptr.index, ptr.bytes);
     } else if (ptr.type === "float") {
         if (ptr.bytes !== 4) { throw new RangeError(`Invalid ptr.bytes (${ptr.bytes}): accept 4`); }
-        return {
-            index: ptr.index,
-            value: buff.readFloatLE(ptr.index),
-        };
+        return buff.readFloatLE(ptr.index);
     } else if (ptr.type === "string") {
         const value = buff.toString("ascii", ptr.index, buff.indexOf(0x00, ptr.index));
         // string terminator must be part of the string bounds
         if (value.length + 1 > ptr.bytes) { throw new Error(`Invalid string: decoded length (${value.length}) must be <= ptr.bytes (${ptr.bytes})`); }
-        return {
-            index: ptr.index,
-            value,
-        };
+        return value;
     } else {
         throw new RangeError(`Invalid ptr.type (${ptr.type}): accept int|float|string`);
     }
