@@ -10,7 +10,7 @@ export class Broker<T> {
     private requestPool: IRequestPool<T> = {};
 
     public async awaitResponse(respId: number, timeout: number = 5000): Promise<T> {
-        if (timeout < 0) { throw new TypeError(`argument "timeout" must be >= 0`); }
+        if (timeout < 0) { throw new RangeError(`argument "timeout" must be >= 0`); }
         if (this.requestPool[respId] !== undefined) { throw new Error(`respId ${respId} already registered`); }
 
         const pr = new Promise((resolve: (resp: T) => void, reject) => {
