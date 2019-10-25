@@ -22,6 +22,12 @@ export class EV3Base {
             });
     }
 
+    /**
+     * Send a Direct Command to the connected EV3 Brick
+     * @param params Array of parameters to send.
+     * Takes string, single byte number (0 - 255) or IParam* object.
+     * @param ack wait for response - default true
+     */
     public async sendRequest(params: RequestParam[], ack?: true): Promise<IResponseValue[]>;
     public async sendRequest(params: RequestParam[], ack: false): Promise<void>;
     public async sendRequest(params: RequestParam[], ack: boolean = true) {
