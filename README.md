@@ -8,9 +8,7 @@ The control code is an implementation of the official documentation available on
 
 ## Usage
 
-```bash
-npm install ev3-direct
-```
+⚠⚠⚠ This package is not yet published to npm! For the time being you will have to clone this repository. ⚠⚠⚠
 
 Connect your EV3 P-Brick over Bluetooth.
 
